@@ -23,7 +23,7 @@ def seach(page):
         "q": "昨日客流"
     }
 
-    url = f"https://weibo.com/ajax/statuses/searchProfile?"
+    url = "https://weibo.com/ajax/statuses/searchProfile?"
 
     return requests.get(url, headers=headers, params=params).json()
 
