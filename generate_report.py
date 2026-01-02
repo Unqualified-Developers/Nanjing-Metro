@@ -8,8 +8,24 @@ import pandas as pd
 
 def generate_html_report():
     """生成HTML报告"""
+
+    # 优先从 docs/data 目录读取
+    data_dirs = [
+        'docs/data/最近7天客流数据.csv',
+        '最近7天客流数据.csv',
+        '最近7天客流数据.csv'
+    ]
     
-    # 读取最新数据
+    df = pd.DataFrame()
+    for csv_path in data_dirs:
+        if os.path.exists(csv_path):
+            try:
+                df = pd.read_csv(csv_path, encoding='utf-8')
+                if not df.empty:
+                    break
+            except Exception as e:
+                print(f"读取 {csv_path} 时出错: {e}")
+                continue
     if os.path.exists('最近7天客流数据.csv'):
         df = pd.read_csv('最近7天客流数据.csv')
         latest_date = df['date'].iloc[0] if len(df) > 0 else "N/A"
