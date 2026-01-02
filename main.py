@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+
+# 首先配置字体
+try:
+    from setup_fonts import setup_chinese_fonts, test_chinese_font
+    if setup_chinese_fonts():
+        print("✓ 字体配置完成")
+    else:
+        print("⚠ 字体配置可能有问题，继续运行...")
+except Exception as e:
+    print(f"⚠ 字体配置脚本出错: {e}")
+
+# 然后导入其他库
+import matplotlib
+matplotlib.use('Agg')  # 使用Agg后端，避免GUI问题
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import matplotlib.font_manager as fm
 import numpy as np
 from metro_data import NanjingSubwayDataCollector
 import pandas as pd
-import os
 import logging
 from datetime import datetime
 import json
@@ -24,56 +38,51 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# 解决中文乱码问题的完整方案
-def setup_chinese_font():
-    """设置中文字体，解决乱码问题"""
+# 确保中文字体设置
+def ensure_chinese_font():
+    """确保中文字体设置正确"""
     try:
-        # 方法1: 查找系统中已安装的中文字体
-        chinese_fonts = []
-        font_paths = [
-            # Windows 字体路径
-            'C:/Windows/Fonts/msyh.ttc',  # 微软雅黑
-            'C:/Windows/Fonts/simhei.ttf',  # 黑体
-            'C:/Windows/Fonts/simkai.ttf',  # 楷体
-            # Linux 字体路径
-            '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',  # 文泉驿正黑
-            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # DejaVu Sans
-            # Mac 字体路径
-            '/System/Library/Fonts/PingFang.ttc',  # 苹方
-            '/System/Library/Fonts/STHeiti Light.ttc',  # 黑体
-        ]
+        # 检查当前字体设置
+        current_fonts = plt.rcParams.get('font.sans-serif', [])
+        print(f"当前字体设置: {current_fonts}")
         
-        for font_path in font_paths:
-            if os.path.exists(font_path):
-                chinese_fonts.append(font_path)
-        
-        if chinese_fonts:
-            # 添加字体到matplotlib
-            for font_file in chinese_fonts:
-                try:
-                    fm.fontManager.addfont(font_file)
-                    font_name = fm.FontProperties(fname=font_file).get_name()
-                    plt.rcParams['font.sans-serif'] = [font_name]
-                    plt.rcParams['axes.unicode_minus'] = False
-                    logger.info(f"成功加载字体: {font_name}")
-                    break
-                except Exception as e:
-                    logger.warning(f"加载字体 {font_file} 失败: {e}")
-        
-        # 方法2: 使用默认配置作为后备
-        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'SimHei', 'Microsoft YaHei', 'WenQuanYi Zen Hei', 'sans-serif']
-        plt.rcParams['axes.unicode_minus'] = False
-        
+        if not current_fonts:
+            # 如果没有设置，尝试设置
+            font_candidates = [
+                'WenQuanYi Zen Hei',
+                'DejaVu Sans',
+                'Liberation Sans',
+                'Arial Unicode MS',
+                'sans-serif'
+            ]
+            
+            # 检查哪些字体可用
+            available_fonts = []
+            all_fonts = [f.name for f in fm.fontManager.ttflist]
+            for font in font_candidates:
+                if font in all_fonts:
+                    available_fonts.append(font)
+            
+            if available_fonts:
+                plt.rcParams['font.sans-serif'] = available_fonts
+                plt.rcParams['axes.unicode_minus'] = False
+                print(f"已设置字体: {available_fonts}")
+            else:
+                # 紧急备用方案：使用默认字体
+                plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'sans-serif']
+                plt.rcParams['axes.unicode_minus'] = False
+                print("使用默认字体设置")
+                
     except Exception as e:
-        logger.error(f"设置中文字体时出错: {e}")
+        logger.error(f"确保字体设置时出错: {e}")
 
-# 调用字体设置函数
-setup_chinese_font()
+# 调用字体检查
+ensure_chinese_font()
 
 # 设置图表样式
-mpl.rcParams['figure.dpi'] = 100
-mpl.rcParams['savefig.dpi'] = 300
-mpl.rcParams['figure.figsize'] = (14, 8)
+plt.rcParams['figure.dpi'] = 100
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['figure.figsize'] = (14, 8)
 
 class NanjingSubwayVisualizer:
     """南京地铁数据可视化器"""
