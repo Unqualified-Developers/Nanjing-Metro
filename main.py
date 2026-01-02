@@ -112,8 +112,10 @@ class NanjingSubwayVisualizer:
         """改进的饼图：解决标签重叠问题"""
         try:
             proportions = self.data_collector.get_latest_line_proportions()
-            latest_date = self.data_collector.get_latest_date()
-            
+
+            latest_data = self.data_collector.get_latest_data()
+            total_passenger = latest_data['passenger_data'].get('总客流量', 0)
+
             if not proportions:
                 logger.warning("没有找到最新数据")
                 return None
@@ -148,16 +150,18 @@ class NanjingSubwayVisualizer:
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
             
             # 1. 改进的饼图 - 使用外部标签和引导线
+            # 定义自定义的autopct函数
+            def autopct_func(pct):
+                actual = total_passenger * pct / 100
+                return f'{pct:.1f}%\n({actual:.1f}万)'
+
             wedges, texts, autotexts = ax1.pie(
-                main_values, 
-                labels=main_lines, 
-                autopct=lambda pct: f'{pct:.1f}%\n({pct*sum(main_values)/100:.1f}万)' if pct >= 2 else '',
+                values, 
+                labels=lines, 
+                autopct=autopct_func,
                 colors=colors,
                 startangle=90,
-                pctdistance=0.85,
-                labeldistance=1.1,
-                wedgeprops=dict(width=0.3, edgecolor='white'),  # 环形图
-                textprops={'fontsize': 10, 'fontweight': 'bold'}
+                textprops={'fontsize': 9}
             )
             
             # 调整标签位置，避免重叠
@@ -259,6 +263,11 @@ class NanjingSubwayVisualizer:
             
             lines = [item[0] for item in top_items]
             values = [item[1] for item in top_items]
+            # 计算每条线路的实际客流量
+            actual_passengers = []
+            for value in values:
+                actual = total_passenger * value / 100
+                actual_passengers.append(actual)
             
             # 获取颜色
             colors = [self.line_colors.get(line, '#CCCCCC') for line in lines]
