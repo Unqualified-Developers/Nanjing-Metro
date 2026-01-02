@@ -493,41 +493,79 @@ def main():
             logger.info(f"最新数据: {latest_date}")
             logger.info(f"总客流量: {total:.1f}万")
             
+            # 显示线路信息
+            logger.info("=== 线路配置信息 ===")
+            for line in collector.all_lines:
+                info = collector.get_line_info(line)
+                color = info.get('color', '默认颜色')
+                logger.info(f"{line}: {color} - {info.get('description', '')}")
+            
             # 初始化可视化器
             visualizer = NanjingSubwayVisualizer(collector)
             
-            # 生成图表
-            logger.info("正在生成可视化图表...")
-            visualizer.plot_latest_line_proportion()
-            visualizer.plot_last_n_days_line_trend(7)
-            visualizer.plot_comprehensive_analysis(7)
+            # 1. 绘制改进的昨日客流线路占比图
+            logger.info("1. 正在绘制改进的昨日客流线路占比图...")
+            fig1 = visualizer.plot_latest_line_proportion_improved()
+            if fig1:
+                logger.info("  改进的饼图已保存")
             
-            # 保存数据
+            # 2. 绘制紧凑型饼图（适合小屏幕）
+            logger.info("2. 正在绘制紧凑型饼图...")
+            fig2 = visualizer.plot_compact_pie_chart()
+            if fig2:
+                logger.info("  紧凑型饼图已保存")
+            
+            # 3. 绘制最近7天客流强度变化趋势图
+            logger.info("3. 正在绘制最近7天客流强度变化趋势图...")
+            fig3 = visualizer.plot_last_n_days_line_trend(7)
+            if fig3:
+                logger.info("  趋势图已保存")
+            
+            # 4. 绘制综合分析仪表板
+            logger.info("4. 正在绘制综合分析仪表板...")
+            fig4 = visualizer.plot_comprehensive_analysis(7)
+            if fig4:
+                logger.info("  综合分析仪表板已保存")
+            
+            # 保存数据到文件
             os.makedirs('docs/data', exist_ok=True)
             df = collector.get_last_n_days_line_data(7)
             if not df.empty:
+                # 保存为CSV
                 df.to_csv('docs/data/最近7天客流数据.csv', index=False, encoding='utf-8-sig')
-                logger.info("数据已保存")
-            
-            # 保存最新数据到JSON
-            data_summary = {
-                'update_time': datetime.now().isoformat(),
-                'latest_date': latest_date,
-                'latest_total': float(total),
-                'record_count': len(passenger_records),
-                'lines_analyzed': collector.all_lines
-            }
-            
-            with open('docs/data/latest_summary.json', 'w', encoding='utf-8') as f:
-                json.dump(data_summary, f, ensure_ascii=False, indent=2)
+                
+                # 保存为JSON（便于网页直接读取）
+                json_data = {
+                    'latest_date': latest_date,
+                    'latest_total': float(total),
+                    'data': df.to_dict('records'),
+                    'update_time': datetime.now().isoformat()
+                }
+                
+                with open('docs/data/latest_data.json', 'w', encoding='utf-8') as f:
+                    json.dump(json_data, f, ensure_ascii=False, indent=2)
+                
+                logger.info("数据已保存为CSV和JSON格式")
             
             logger.info("分析完成！")
             
+            # 打印总结信息
+            print("\n" + "="*50)
+            print("✅ 南京地铁客流分析完成！")
+            print("="*50)
+            print(f"📅 最新数据日期: {latest_date}")
+            print(f"👥 总客流量: {total:.1f}万")
+            print(f"📊 生成图表数: 4张")
+            print(f"💾 数据文件: 最近7天客流数据.csv")
+            print("="*50)
+            
         else:
             logger.warning("没有收集到数据")
+            print("❌ 没有收集到数据，请检查数据源或网络连接")
             
     except Exception as e:
         logger.error(f"运行过程中发生错误: {e}", exc_info=True)
+        print(f"❌ 运行出错: {e}")
         raise
 
 if __name__ == "__main__":
