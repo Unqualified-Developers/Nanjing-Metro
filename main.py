@@ -10,6 +10,7 @@ import pandas as pd
 import os
 import logging
 from datetime import datetime
+import json
 
 # 配置日志
 logging.basicConfig(
@@ -98,8 +99,8 @@ class NanjingSubwayVisualizer:
         
         return colors
     
-    def plot_latest_line_proportion(self):
-        """绘制最新一天各线路客流占比图"""
+    def plot_latest_line_proportion_improved(self):
+        """改进的饼图：解决标签重叠问题"""
         try:
             proportions = self.data_collector.get_latest_line_proportions()
             latest_date = self.data_collector.get_latest_date()
@@ -108,49 +109,106 @@ class NanjingSubwayVisualizer:
                 logger.warning("没有找到最新数据")
                 return None
             
+            # 按占比从大到小排序
             sorted_items = sorted(proportions.items(), key=lambda x: x[1], reverse=True)
-            lines = [item[0] for item in sorted_items]
-            values = [item[1] for item in sorted_items]
             
-            colors = [self.line_colors.get(line, '#CCCCCC') for line in lines]
+            # 方案1：过滤掉占比太小的线路（< 2%），归为"其他"
+            main_lines = []
+            main_values = []
+            other_value = 0
+            other_lines = []
+            
+            for line_name, value in sorted_items:
+                if value >= 2:  # 只显示占比大于等于2%的线路
+                    main_lines.append(line_name)
+                    main_values.append(value)
+                else:
+                    other_value += value
+                    other_lines.append(line_name)
+            
+            # 如果有"其他"类别，添加到数据中
+            if other_value > 0:
+                main_lines.append(f"其他({len(other_lines)}条)")
+                main_values.append(other_value)
+            
+            # 获取对应颜色
+            colors = [self.line_colors.get(line, '#CCCCCC') for line in main_lines]
+            if other_value > 0:
+                colors[-1] = '#E0E0E0'  # 其他类别用灰色
             
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
             
-            # 饼图
+            # 1. 改进的饼图 - 使用外部标签和引导线
             wedges, texts, autotexts = ax1.pie(
-                values, 
-                labels=lines, 
-                autopct='%1.1f%%',
+                main_values, 
+                labels=main_lines, 
+                autopct=lambda pct: f'{pct:.1f}%\n({pct*sum(main_values)/100:.1f}万)' if pct >= 2 else '',
                 colors=colors,
                 startangle=90,
-                textprops={'fontsize': 9}
+                pctdistance=0.85,
+                labeldistance=1.1,
+                wedgeprops=dict(width=0.3, edgecolor='white'),  # 环形图
+                textprops={'fontsize': 10, 'fontweight': 'bold'}
             )
             
-            for autotext in autotexts:
-                autotext.set_color('white')
-                autotext.set_fontweight('bold')
+            # 调整标签位置，避免重叠
+            for i, (text, autotext) in enumerate(zip(texts, autotexts)):
+                if main_values[i] < 5:  # 小占比标签特殊处理
+                    # 将小占比标签移到外部
+                    text.set_position((text.get_position()[0]*1.3, text.get_position()[1]*1.3))
+                    if main_values[i] >= 2:  # 只显示大于等于2%的百分比
+                        autotext.set_position((autotext.get_position()[0]*1.15, autotext.get_position()[1]*1.15))
             
-            ax1.set_title(f'{latest_date} 南京地铁各线路客流占比（饼图）', fontsize=14, fontweight='bold')
+            # 设置饼图标题
+            ax1.set_title(f'{latest_date} 南京地铁各线路客流占比\n(环形图，过滤小于2%线路)', 
+                         fontsize=14, fontweight='bold')
             ax1.axis('equal')
             
-            # 条形图
-            y_pos = np.arange(len(lines))
-            bars = ax2.barh(y_pos, values, color=colors)
+            # 2. 堆叠条形图 - 替代小占比饼图
+            # 准备数据：前N条主要线路 + 其他
+            top_n = 8  # 显示前8条主要线路
+            if len(sorted_items) > top_n:
+                display_items = sorted_items[:top_n]
+                other_items = sorted_items[top_n:]
+                other_total = sum(item[1] for item in other_items)
+                display_items.append(("其他", other_total))
+            else:
+                display_items = sorted_items
+            
+            display_lines = [item[0] for item in display_items]
+            display_values = [item[1] for item in display_items]
+            display_colors = [self.line_colors.get(line, '#CCCCCC') for line in display_lines]
+            if len(sorted_items) > top_n:
+                display_colors[-1] = '#E0E0E0'
+            
+            # 创建堆叠条形图
+            y_pos = np.arange(len(display_lines))
+            cumulative = np.zeros(len(display_lines))
+            
+            for i in range(len(display_lines)):
+                ax2.barh(y_pos[i], display_values[i], left=cumulative[i], 
+                        color=display_colors[i], edgecolor='white')
+                # 添加数值标签
+                if display_values[i] > 0:
+                    ax2.text(cumulative[i] + display_values[i]/2, y_pos[i],
+                            f'{display_values[i]:.1f}%', 
+                            ha='center', va='center',
+                            color='white' if display_values[i] > 5 else 'black',
+                            fontweight='bold')
+                cumulative[i] += display_values[i]
+            
             ax2.set_yticks(y_pos)
-            ax2.set_yticklabels(lines, fontsize=10)
-            ax2.invert_yaxis()
+            ax2.set_yticklabels(display_lines, fontsize=10)
             ax2.set_xlabel('占比 (%)', fontsize=12)
-            ax2.set_title(f'{latest_date} 南京地铁各线路客流占比（条形图）', fontsize=14, fontweight='bold')
+            ax2.set_title(f'{latest_date} 南京地铁各线路客流占比\n(堆叠条形图，显示所有线路)', 
+                         fontsize=14, fontweight='bold')
+            ax2.set_xlim(0, 100)
             
-            for bar, value in zip(bars, values):
-                width = bar.get_width()
-                ax2.text(width + 0.5, bar.get_y() + bar.get_height()/2,
-                        f'{value:.1f}%', ha='left', va='center', fontsize=9)
-            
+            # 添加总客流量信息
             latest_data = self.data_collector.get_latest_data()
             total = latest_data['passenger_data'].get('总客流量', 0)
             
-            fig.suptitle(f'南京地铁客流分析 - {latest_date}（总客流量: {total:.1f}万）', 
+            fig.suptitle(f'南京地铁客流分析 - {latest_date}\n总客流量: {total:.1f}万人次', 
                         fontsize=16, fontweight='bold', y=1.02)
             plt.tight_layout()
             
@@ -159,11 +217,97 @@ class NanjingSubwayVisualizer:
             fig.savefig('docs/images/昨日客流线路占比图.png', dpi=300, bbox_inches='tight')
             plt.close(fig)
             
-            logger.info("昨日客流线路占比图已生成")
+            logger.info("改进的饼图已生成")
             return fig
             
         except Exception as e:
-            logger.error(f"生成占比图时出错: {e}")
+            logger.error(f"生成改进饼图时出错: {e}", exc_info=True)
+            return None
+    
+    def plot_compact_pie_chart(self):
+        """紧凑型饼图：更适合小屏幕查看"""
+        try:
+            proportions = self.data_collector.get_latest_line_proportions()
+            latest_date = self.data_collector.get_latest_date()
+            
+            if not proportions:
+                logger.warning("没有找到最新数据")
+                return None
+            
+            # 按占比排序
+            sorted_items = sorted(proportions.items(), key=lambda x: x[1], reverse=True)
+            
+            # 只取前8条线路，其余归为"其他"
+            top_n = 8
+            if len(sorted_items) > top_n:
+                top_items = sorted_items[:top_n]
+                other_items = sorted_items[top_n:]
+                other_total = sum(item[1] for item in other_items)
+                if other_total > 0:
+                    top_items.append(("其他", other_total))
+            else:
+                top_items = sorted_items
+            
+            lines = [item[0] for item in top_items]
+            values = [item[1] for item in top_items]
+            
+            # 获取颜色
+            colors = [self.line_colors.get(line, '#CCCCCC') for line in lines]
+            if len(sorted_items) > top_n:
+                colors[-1] = '#E0E0E0'
+            
+            fig, ax = plt.subplots(figsize=(12, 10))
+            
+            # 使用外部的标签，避免重叠
+            wedges, texts = ax.pie(
+                values,
+                colors=colors,
+                startangle=90,
+                wedgeprops=dict(width=0.4, edgecolor='white'),
+                labels=None  # 不显示内部标签
+            )
+            
+            # 创建图例，显示完整信息
+            legend_labels = []
+            for line, value in zip(lines, values):
+                if line.startswith("其他"):
+                    legend_labels.append(f"{line}: {value:.1f}%")
+                else:
+                    legend_labels.append(f"{line}: {value:.1f}%")
+            
+            # 将图例放在图表右侧
+            ax.legend(wedges, legend_labels,
+                     title="线路占比",
+                     loc="center left",
+                     bbox_to_anchor=(1, 0, 0.5, 1),
+                     fontsize=10,
+                     title_fontsize=12)
+            
+            # 在饼图中心添加总客流量信息
+            latest_data = self.data_collector.get_latest_data()
+            total = latest_data['passenger_data'].get('总客流量', 0)
+            
+            center_text = f"{latest_date}\n总客流\n{total:.1f}万"
+            ax.text(0, 0, center_text,
+                   ha='center', va='center',
+                   fontsize=14, fontweight='bold',
+                   bbox=dict(boxstyle="round,pad=0.3", facecolor='white', alpha=0.8))
+            
+            ax.set_title('南京地铁客流占比分析', fontsize=16, fontweight='bold')
+            ax.axis('equal')
+            
+            plt.tight_layout()
+            
+            # 保存为额外的小屏幕版本
+            os.makedirs('docs/images', exist_ok=True)
+            fig.savefig('docs/images/紧凑型客流占比图.png', dpi=300, bbox_inches='tight')
+            plt.close(fig)
+            
+            logger.info("紧凑型饼图已生成")
+            return fig
+            
+        except Exception as e:
+            logger.error(f"生成紧凑型饼图时出错: {e}", exc_info=True)
             return None
     
     def plot_last_n_days_line_trend(self, n_days=7):
