@@ -56,4 +56,4 @@ jobs:
         publish_dir: ./docs
         publish_branch: gh-pages
         force_orphan: true
-        commit_message: "📊 Daily update: Nanjing Metro Analysis $(date +'%Y-%m-%d')"
+        commit_message: "📊 Daily update: Nanjing Metro Analysis"
