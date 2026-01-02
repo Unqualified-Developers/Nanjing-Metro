@@ -3,13 +3,13 @@
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.font_manager as fm
 import numpy as np
 from metro_data import NanjingSubwayDataCollector
 import pandas as pd
 import os
 import logging
 from datetime import datetime
-import json
 
 # 配置日志
 logging.basicConfig(
@@ -23,10 +23,56 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# 设置中文字体和图表样式
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
-plt.rcParams['axes.unicode_minus'] = False
+# 解决中文乱码问题的完整方案
+def setup_chinese_font():
+    """设置中文字体，解决乱码问题"""
+    try:
+        # 方法1: 查找系统中已安装的中文字体
+        chinese_fonts = []
+        font_paths = [
+            # Windows 字体路径
+            'C:/Windows/Fonts/msyh.ttc',  # 微软雅黑
+            'C:/Windows/Fonts/simhei.ttf',  # 黑体
+            'C:/Windows/Fonts/simkai.ttf',  # 楷体
+            # Linux 字体路径
+            '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',  # 文泉驿正黑
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # DejaVu Sans
+            # Mac 字体路径
+            '/System/Library/Fonts/PingFang.ttc',  # 苹方
+            '/System/Library/Fonts/STHeiti Light.ttc',  # 黑体
+        ]
+        
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                chinese_fonts.append(font_path)
+        
+        if chinese_fonts:
+            # 添加字体到matplotlib
+            for font_file in chinese_fonts:
+                try:
+                    fm.fontManager.addfont(font_file)
+                    font_name = fm.FontProperties(fname=font_file).get_name()
+                    plt.rcParams['font.sans-serif'] = [font_name]
+                    plt.rcParams['axes.unicode_minus'] = False
+                    logger.info(f"成功加载字体: {font_name}")
+                    break
+                except Exception as e:
+                    logger.warning(f"加载字体 {font_file} 失败: {e}")
+        
+        # 方法2: 使用默认配置作为后备
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'SimHei', 'Microsoft YaHei', 'WenQuanYi Zen Hei', 'sans-serif']
+        plt.rcParams['axes.unicode_minus'] = False
+        
+    except Exception as e:
+        logger.error(f"设置中文字体时出错: {e}")
+
+# 调用字体设置函数
+setup_chinese_font()
+
+# 设置图表样式
 mpl.rcParams['figure.dpi'] = 100
+mpl.rcParams['savefig.dpi'] = 300
+mpl.rcParams['figure.figsize'] = (14, 8)
 
 class NanjingSubwayVisualizer:
     """南京地铁数据可视化器"""
