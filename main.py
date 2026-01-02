@@ -3,6 +3,7 @@ import matplotlib as mpl
 import numpy as np
 from metro_data import NanjingSubwayDataCollector
 import pandas as pd
+import colorsys
 
 # 设置中文字体和图表样式
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
@@ -15,8 +16,33 @@ class NanjingSubwayVisualizer:
     
     def __init__(self, data_collector):
         self.data_collector = data_collector
-        self.colors = plt.cm.Set3(np.linspace(0, 1, len(data_collector.all_lines)))
+        self.line_colors = self._get_line_colors()
         
+    def _get_line_colors(self):
+        """获取线路颜色，如果没有配置则生成默认颜色"""
+        colors = {}
+        line_colors_config = self.data_collector.get_line_colors()
+        
+        # 如果配置中有颜色，使用配置的颜色
+        if line_colors_config:
+            return line_colors_config
+        
+        # 否则生成默认颜色
+        all_lines = self.data_collector.all_lines
+        n_lines = len(all_lines)
+        
+        # 使用Set3色彩映射
+        cmap = plt.cm.Set3
+        for i, line in enumerate(all_lines):
+            colors[line] = cmap(i / max(1, n_lines - 1))
+        
+        return colors
+    
+    def hex_to_rgb(self, hex_color):
+        """将十六进制颜色转换为RGB"""
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4))
+    
     def plot_latest_line_proportion(self):
         """绘制最新一天各线路客流占比图"""
         proportions = self.data_collector.get_latest_line_proportions()
@@ -31,6 +57,9 @@ class NanjingSubwayVisualizer:
         lines = [item[0] for item in sorted_items]
         values = [item[1] for item in sorted_items]
         
+        # 获取对应颜色
+        colors = [self.line_colors.get(line, '#CCCCCC') for line in lines]
+        
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
         
         # 1. 饼图
@@ -38,7 +67,7 @@ class NanjingSubwayVisualizer:
             values, 
             labels=lines, 
             autopct='%1.1f%%',
-            colors=self.colors[:len(lines)],
+            colors=colors,
             startangle=90,
             textprops={'fontsize': 9}
         )
@@ -53,7 +82,7 @@ class NanjingSubwayVisualizer:
         
         # 2. 条形图
         y_pos = np.arange(len(lines))
-        bars = ax2.barh(y_pos, values, color=self.colors[:len(lines)])
+        bars = ax2.barh(y_pos, values, color=colors)
         ax2.set_yticks(y_pos)
         ax2.set_yticklabels(lines, fontsize=10)
         ax2.invert_yaxis()  # 最高的在最上面
@@ -76,31 +105,32 @@ class NanjingSubwayVisualizer:
         
         return fig
     
-    def plot_last_7_days_line_trend(self):
-        """绘制最近7天各线路客流强度变化趋势图"""
-        df = self.data_collector.get_last_n_days_line_data(7)
+    def plot_last_n_days_line_trend(self, n_days=7):
+        """绘制最近n天各线路客流强度变化趋势图"""
+        df = self.data_collector.get_last_n_days_line_data(n_days)
         
         if df.empty:
-            print("没有找到最近7天的数据")
+            print(f"没有找到最近{n_days}天的数据")
             return None
         
         fig, ax = plt.subplots(figsize=(14, 8))
         
         # 绘制每条线路的趋势线
-        for i, line in enumerate(self.data_collector.all_lines):
+        for line in self.data_collector.all_lines:
             if line in df.columns:
                 # 只显示有数据的线路
                 if df[line].notna().any():
+                    color = self.line_colors.get(line, '#CCCCCC')
                     ax.plot(df['date'], df[line], 
                            label=line, 
-                           color=self.colors[i],
+                           color=color,
                            marker='o',
                            linewidth=2.5,
                            markersize=8)
         
         ax.set_xlabel('日期', fontsize=12)
         ax.set_ylabel('客流量（万）', fontsize=12)
-        ax.set_title('最近7天南京地铁各线路客流强度变化趋势', fontsize=14, fontweight='bold')
+        ax.set_title(f'最近{n_days}天南京地铁各线路客流强度变化趋势', fontsize=14, fontweight='bold')
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
         ax.grid(True, alpha=0.3, linestyle='--')
         
@@ -124,12 +154,12 @@ class NanjingSubwayVisualizer:
         plt.tight_layout()
         return fig
     
-    def plot_last_7_days_proportion_trend(self):
-        """绘制最近7天各线路客流占比变化趋势图"""
-        df_prop = self.data_collector.get_last_n_days_proportions(7)
+    def plot_last_n_days_proportion_trend(self, n_days=7):
+        """绘制最近n天各线路客流占比变化趋势图"""
+        df_prop = self.data_collector.get_last_n_days_proportions(n_days)
         
         if df_prop.empty:
-            print("没有找到最近7天的数据")
+            print(f"没有找到最近{n_days}天的数据")
             return None
         
         # 创建子图
@@ -141,16 +171,17 @@ class NanjingSubwayVisualizer:
         for i, line in enumerate(main_lines):
             col_name = f'{line}_占比'
             if col_name in df_prop.columns:
+                color = self.line_colors.get(line, '#CCCCCC')
                 axes[0].plot(df_prop['date'], df_prop[col_name], 
                            label=line, 
-                           color=self.colors[i],
+                           color=color,
                            marker='o',
                            linewidth=2.5,
                            markersize=8)
         
         axes[0].set_xlabel('日期', fontsize=12)
         axes[0].set_ylabel('占比 (%)', fontsize=12)
-        axes[0].set_title('最近7天主要线路客流占比变化趋势', fontsize=14, fontweight='bold')
+        axes[0].set_title(f'最近{n_days}天主要线路客流占比变化趋势', fontsize=14, fontweight='bold')
         axes[0].legend(loc='upper right', fontsize=10)
         axes[0].grid(True, alpha=0.3, linestyle='--')
         axes[0].set_xticklabels(df_prop['date'], rotation=45, ha='right')
@@ -161,16 +192,17 @@ class NanjingSubwayVisualizer:
         for i, line in enumerate(s_lines):
             col_name = f'{line}_占比'
             if col_name in df_prop.columns:
+                color = self.line_colors.get(line, '#CCCCCC')
                 axes[1].plot(df_prop['date'], df_prop[col_name], 
                            label=line, 
-                           color=self.colors[i + len(main_lines)],
+                           color=color,
                            marker='s',
                            linewidth=2.5,
                            markersize=8)
         
         axes[1].set_xlabel('日期', fontsize=12)
         axes[1].set_ylabel('占比 (%)', fontsize=12)
-        axes[1].set_title('最近7天S线路客流占比变化趋势', fontsize=14, fontweight='bold')
+        axes[1].set_title(f'最近{n_days}天S线路客流占比变化趋势', fontsize=14, fontweight='bold')
         axes[1].legend(loc='upper right', fontsize=10)
         axes[1].grid(True, alpha=0.3, linestyle='--')
         axes[1].set_xticklabels(df_prop['date'], rotation=45, ha='right')
@@ -178,7 +210,7 @@ class NanjingSubwayVisualizer:
         plt.tight_layout()
         return fig
     
-    def plot_comprehensive_analysis(self):
+    def plot_comprehensive_analysis(self, n_days=7):
         """绘制综合分析仪表板"""
         fig = plt.figure(figsize=(18, 12))
         
@@ -187,7 +219,7 @@ class NanjingSubwayVisualizer:
         
         # 1. 最新一天占比饼图
         ax1 = fig.add_subplot(gs[0, 0])
-        proportions = self.data_collector.get_latest_line_proportion()
+        proportions = self.data_collector.get_latest_line_proportions()
         latest_date = self.data_collector.get_latest_date()
         
         if proportions:
@@ -195,19 +227,22 @@ class NanjingSubwayVisualizer:
             top5_lines = [item[0] for item in sorted_items[:5]]
             top5_values = [item[1] for item in sorted_items[:5]]
             
+            # 获取颜色
+            top5_colors = [self.line_colors.get(line, '#CCCCCC') for line in top5_lines]
+            
             ax1.pie(top5_values, labels=top5_lines, autopct='%1.1f%%',
-                   colors=self.colors[:5], startangle=90)
+                   colors=top5_colors, startangle=90)
             ax1.set_title(f'{latest_date} TOP5线路占比', fontsize=12, fontweight='bold')
         
-        # 2. 最近7天总客流趋势
+        # 2. 最近n天总客流趋势
         ax2 = fig.add_subplot(gs[0, 1:])
-        df = self.data_collector.get_last_n_days_line_data(7)
+        df = self.data_collector.get_last_n_days_line_data(n_days)
         if not df.empty and 'total' in df.columns:
             ax2.plot(df['date'], df['total'], 'b-o', linewidth=2, markersize=8)
             ax2.fill_between(df['date'], df['total'], alpha=0.2)
             ax2.set_xlabel('日期')
             ax2.set_ylabel('总客流量（万）')
-            ax2.set_title('最近7天总客流趋势', fontsize=12, fontweight='bold')
+            ax2.set_title(f'最近{n_days}天总客流趋势', fontsize=12, fontweight='bold')
             ax2.grid(True, alpha=0.3)
             ax2.set_xticklabels(df['date'], rotation=45, ha='right')
         
@@ -248,7 +283,7 @@ class NanjingSubwayVisualizer:
                                     color='black' if value > heatmap_data.max()/2 else 'white',
                                     fontsize=8)
                 
-                ax3.set_title('主要线路客流量热力图（最近7天）', fontsize=14, fontweight='bold')
+                ax3.set_title(f'主要线路客流量热力图（最近{n_days}天）', fontsize=14, fontweight='bold')
         
         # 4. 统计信息文本框
         ax4 = fig.add_subplot(gs[2, 0])
@@ -281,6 +316,47 @@ class NanjingSubwayVisualizer:
         plt.tight_layout()
         
         return fig
+    
+    def plot_line_info_table(self):
+        """绘制线路信息表格"""
+        fig, ax = plt.subplots(figsize=(14, 10))
+        ax.axis('tight')
+        ax.axis('off')
+        
+        # 准备表格数据
+        table_data = []
+        headers = ['线路名称', '颜色', '开通日期', '车站数量', '描述']
+        
+        for line in self.data_collector.all_lines:
+            info = self.data_collector.get_line_info(line)
+            color = info.get('color', '#CCCCCC')
+            
+            # 创建颜色示例
+            color_cell = plt.Rectangle((0, 0), 1, 1, fc=color)
+            
+            row = [
+                line,
+                color_cell,
+                info.get('opening_date', 'N/A'),
+                info.get('stations', 'N/A'),
+                info.get('description', 'N/A')
+            ]
+            table_data.append(row)
+        
+        # 创建表格
+        table = ax.table(cellText=table_data, colLabels=headers, 
+                        cellLoc='center', loc='center',
+                        colColours=['#f0f0f0']*5)
+        
+        # 调整表格样式
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1, 1.5)
+        
+        ax.set_title('南京地铁线路信息', fontsize=16, fontweight='bold', y=1.02)
+        
+        plt.tight_layout()
+        return fig
 
 
 def main():
@@ -288,7 +364,7 @@ def main():
     print("开始收集南京地铁客流数据...")
     
     # 初始化数据收集器
-    collector = NanjingSubwayDataCollector()
+    collector = NanjingSubwayDataCollector("config.json")
     
     # 收集数据
     passenger_records = collector.collect_data()
@@ -304,6 +380,13 @@ def main():
         print(f"\n最新数据: {latest_date}")
         print(f"总客流量: {total:.1f}万")
         
+        # 显示线路信息
+        print("\n=== 线路配置信息 ===")
+        for line in collector.all_lines:
+            info = collector.get_line_info(line)
+            color = info.get('color', '默认颜色')
+            print(f"{line}: {color} - {info.get('description', '')}")
+        
         # 初始化可视化器
         visualizer = NanjingSubwayVisualizer(collector)
         
@@ -316,24 +399,31 @@ def main():
         
         # 2. 绘制最近7天客流强度变化趋势图
         print("\n2. 正在绘制最近7天客流强度变化趋势图...")
-        fig2 = visualizer.plot_last_7_days_line_trend()
+        fig2 = visualizer.plot_last_n_days_line_trend(7)
         if fig2:
             fig2.savefig('最近7天客流强度变化趋势图.png', dpi=300, bbox_inches='tight')
             print("  已保存为: 最近7天客流强度变化趋势图.png")
         
         # 3. 绘制最近7天客流占比变化趋势图
         print("\n3. 正在绘制最近7天客流占比变化趋势图...")
-        fig3 = visualizer.plot_last_7_days_proportion_trend()
+        fig3 = visualizer.plot_last_n_days_proportion_trend(7)
         if fig3:
             fig3.savefig('最近7天客流占比变化趋势图.png', dpi=300, bbox_inches='tight')
             print("  已保存为: 最近7天客流占比变化趋势图.png")
         
-        # 4. 绘制综合分析仪表板（可选）
+        # 4. 绘制综合分析仪表板
         print("\n4. 正在绘制综合分析仪表板...")
-        fig4 = visualizer.plot_comprehensive_analysis()
+        fig4 = visualizer.plot_comprehensive_analysis(7)
         if fig4:
             fig4.savefig('综合分析仪表板.png', dpi=300, bbox_inches='tight')
             print("  已保存为: 综合分析仪表板.png")
+        
+        # 5. 绘制线路信息表格（可选）
+        print("\n5. 正在绘制线路信息表格...")
+        fig5 = visualizer.plot_line_info_table()
+        if fig5:
+            fig5.savefig('线路信息表格.png', dpi=300, bbox_inches='tight')
+            print("  已保存为: 线路信息表格.png")
         
         # 显示图表
         plt.show()
