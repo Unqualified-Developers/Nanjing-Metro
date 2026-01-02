@@ -54,12 +54,3 @@ jobs:
         publish_branch: gh-pages
         force_orphan: true
         commit_message: "📊 Daily update: Nanjing Metro Analysis $(date +'%Y-%m-%d')"
-        
-    - name: Send notification
-      if: success()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
