@@ -339,17 +339,7 @@ class NanjingSubwayVisualizer:
             ax.grid(True, alpha=0.3, linestyle='--')
             
             plt.xticks(rotation=45, ha='right')
-            
-            if 'total' in df.columns:
-                ax.plot(df['date'], df['total'], 
-                       label='总客流量', 
-                       color='black',
-                       linewidth=3,
-                       linestyle='--',
-                       marker='s',
-                       markersize=10,
-                       alpha=0.7)
-            
+
             ax.set_ylim(bottom=0)
             plt.tight_layout()
             
