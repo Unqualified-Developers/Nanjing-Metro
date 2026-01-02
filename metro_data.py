@@ -9,13 +9,53 @@ import pandas as pd
 class NanjingSubwayDataCollector:
     """南京地铁数据收集器"""
     
-    def __init__(self):
+    def __init__(self, config_file: str = "config.json"):
         self.passenger_records = []
         self.line_data = {}
-        self.all_lines = [
-            "1号线", "2号线", "3号线", "4号线", "5号线", "7号线", "10号线",
-            "S1号线", "S3号线", "S6号线", "S7号线", "S8号线", "S9号线"
-        ]
+        self.config = self.load_config(config_file)
+        self.all_lines = [line["name"] for line in self.config["lines"]]
+        self.line_info = {line["name"]: line for line in self.config["lines"]}
+    
+    def load_config(self, config_file: str) -> Dict:
+        """加载配置文件"""
+        try:
+            with open(config_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            print(f"配置文件 {config_file} 未找到，使用默认配置")
+            return self.get_default_config()
+        except json.JSONDecodeError as e:
+            print(f"配置文件解析错误: {e}")
+            return self.get_default_config()
+    
+    def get_default_config(self) -> Dict:
+        """获取默认配置"""
+        return {
+            "lines": [
+                {"name": "1号线", "color": "#FF0000"},
+                {"name": "2号线", "color": "#FFA500"},
+                {"name": "3号线", "color": "#9ACD32"},
+                {"name": "4号线", "color": "#1E90FF"},
+                {"name": "5号线", "color": "#800080"},
+                {"name": "7号线", "color": "#FF1493"},
+                {"name": "10号线", "color": "#00CED1"},
+                {"name": "S1号线", "color": "#32CD32"},
+                {"name": "S3号线", "color": "#FF4500"},
+                {"name": "S6号线", "color": "#DC143C"},
+                {"name": "S7号线", "color": "#8A2BE2"},
+                {"name": "S8号线", "color": "#FF8C00"},
+                {"name": "S9号线", "color": "#00BFFF"}
+            ],
+            "data_source": {
+                "weibo_user_id": "2638276292",
+                "search_keyword": "昨日客流",
+                "max_pages": 10
+            },
+            "visualization": {
+                "default_days": 7,
+                "color_scheme": "Set3"
+            }
+        }
     
     def search_weibo(self, page: int) -> dict:
         """
@@ -44,9 +84,9 @@ class NanjingSubwayDataCollector:
         }
         
         params = {
-            "uid": "2638276292",
+            "uid": self.config["data_source"]["weibo_user_id"],
             "page": page,
-            "q": "昨日客流"
+            "q": self.config["data_source"]["search_keyword"]
         }
         
         url = "https://weibo.com/ajax/statuses/searchProfile?"
@@ -63,22 +103,13 @@ class NanjingSubwayDataCollector:
         Returns:
             Optional[Dict[str, float]]: 线路到客流量的字典，如果提取失败返回None
         """
-        # 定义线路名称和对应的正则表达式模式
-        line_patterns = {
-            "1号线": r'1号线\s*(\d+(?:\.\d+)?)',
-            "2号线": r'2号线\s*(\d+(?:\.\d+)?)',
-            "3号线": r'3号线\s*(\d+(?:\.\d+)?)',
-            "4号线": r'4号线\s*(\d+(?:\.\d+)?)',
-            "5号线": r'5号线\s*(\d+(?:\.\d+)?)',
-            "7号线": r'7号线\s*(\d+(?:\.\d+)?)',
-            "10号线": r'10号线\s*(\d+(?:\.\d+)?)',
-            "S1号线": r'S1号线\s*(\d+(?:\.\d+)?)',
-            "S3号线": r'S3号线\s*(\d+(?:\.\d+)?)',
-            "S6号线": r'S6号线\s*(\d+(?:\.\d+)?)',
-            "S7号线": r'S7号线\s*(\d+(?:\.\d+)?)',
-            "S8号线": r'S8号线\s*(\d+(?:\.\d+)?)',
-            "S9号线": r'S9号线\s*(\d+(?:\.\d+)?)'
-        }
+        # 动态生成线路正则表达式模式
+        line_patterns = {}
+        for line in self.all_lines:
+            # 处理线路名称中的数字和字母
+            line_name_clean = line.replace("号线", "")
+            pattern = rf'{line.replace("号线", "号线")}\s*(\d+(?:\.\d+)?)'
+            line_patterns[line] = pattern
         
         passenger_data = {}
         
@@ -140,8 +171,9 @@ class NanjingSubwayDataCollector:
             List[Dict]: 包含日期和客流数据的字典列表
         """
         passenger_records = []
+        max_pages = self.config["data_source"].get("max_pages", 10)
         
-        for page in range(1, 10):
+        for page in range(1, max_pages):
             try:
                 response = self.search_weibo(page)
                 
@@ -189,6 +221,17 @@ class NanjingSubwayDataCollector:
                     "total": record['passenger_data'].get('总客流量')
                 })
     
+    def get_line_colors(self) -> Dict[str, str]:
+        """获取所有线路的颜色配置"""
+        colors = {}
+        for line in self.line_info.values():
+            colors[line["name"]] = line.get("color", "#CCCCCC")
+        return colors
+    
+    def get_line_info(self, line_name: str) -> Dict:
+        """获取指定线路的详细信息"""
+        return self.line_info.get(line_name, {})
+    
     def get_latest_date(self) -> str:
         """获取最新日期"""
         if not self.passenger_records:
@@ -201,16 +244,20 @@ class NanjingSubwayDataCollector:
             return {}
         return self.passenger_records[0]
     
-    def get_last_n_days(self, n: int = 7) -> List[Dict]:
+    def get_last_n_days(self, n: int = None) -> List[Dict]:
         """获取最近n天的数据"""
         if not self.passenger_records:
             return []
+        if n is None:
+            n = self.config["visualization"].get("default_days", 7)
         return self.passenger_records[:min(n, len(self.passenger_records))]
     
-    def get_line_last_n_days(self, line_name: str, n: int = 7) -> List[Dict]:
+    def get_line_last_n_days(self, line_name: str, n: int = None) -> List[Dict]:
         """获取指定线路最近n天的数据"""
         if line_name not in self.line_data:
             return []
+        if n is None:
+            n = self.config["visualization"].get("default_days", 7)
         return self.line_data[line_name][:min(n, len(self.line_data[line_name]))]
     
     def get_latest_line_proportions(self) -> Dict[str, float]:
@@ -232,8 +279,10 @@ class NanjingSubwayDataCollector:
         
         return proportions
     
-    def get_last_n_days_line_data(self, n: int = 7) -> pd.DataFrame:
+    def get_last_n_days_line_data(self, n: int = None) -> pd.DataFrame:
         """获取最近n天各线路数据（DataFrame格式）"""
+        if n is None:
+            n = self.config["visualization"].get("default_days", 7)
         last_n_days = self.get_last_n_days(n)
         
         data = []
@@ -246,8 +295,10 @@ class NanjingSubwayDataCollector:
         df = pd.DataFrame(data)
         return df
     
-    def get_last_n_days_proportions(self, n: int = 7) -> pd.DataFrame:
+    def get_last_n_days_proportions(self, n: int = None) -> pd.DataFrame:
         """获取最近n天各线路占比（DataFrame格式）"""
+        if n is None:
+            n = self.config["visualization"].get("default_days", 7)
         df = self.get_last_n_days_line_data(n)
         
         # 计算每条线路的占比
