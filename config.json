@@ -1,0 +1,105 @@
+{
+  "lines": [
+    {
+      "name": "1号线",
+      "color": "#FF0000",
+      "opening_date": "2005-09-03",
+      "stations": 27,
+      "description": "南京地铁最早开通的线路，连接迈皋桥和河定桥"
+    },
+    {
+      "name": "2号线",
+      "color": "#FFA500",
+      "opening_date": "2010-05-28",
+      "stations": 26,
+      "description": "东西走向的主要线路"
+    },
+    {
+      "name": "3号线",
+      "color": "#9ACD32",
+      "opening_date": "2015-04-01",
+      "stations": 29,
+      "description": "南北走向的骨干线路"
+    },
+    {
+      "name": "4号线",
+      "color": "#1E90FF",
+      "opening_date": "2017-01-18",
+      "stations": 18,
+      "description": "东西走向，连接龙江站和仙林湖站"
+    },
+    {
+      "name": "5号线",
+      "color": "#800080",
+      "opening_date": "2023-12-28",
+      "stations": 15,
+      "description": "南京地铁第五条建成运营的线路"
+    },
+    {
+      "name": "7号线",
+      "color": "#FF1493",
+      "opening_date": "2022-12-28",
+      "stations": 27,
+      "description": "南京地铁第七条开通的线路"
+    },
+    {
+      "name": "10号线",
+      "color": "#00CED1",
+      "opening_date": "2014-07-01",
+      "stations": 14,
+      "description": "连接江北新区和主城区"
+    },
+    {
+      "name": "S1号线",
+      "color": "#32CD32",
+      "opening_date": "2014-07-01",
+      "stations": 9,
+      "description": "机场线，连接南京南站和禄口机场"
+    },
+    {
+      "name": "S3号线",
+      "color": "#FF4500",
+      "opening_date": "2017-12-06",
+      "stations": 19,
+      "description": "宁和城际，连接南京南站和高家冲"
+    },
+    {
+      "name": "S6号线",
+      "color": "#DC143C",
+      "opening_date": "2021-12-28",
+      "stations": 13,
+      "description": "宁句城际，连接马群站和句容站"
+    },
+    {
+      "name": "S7号线",
+      "color": "#8A2BE2",
+      "opening_date": "2018-05-26",
+      "stations": 9,
+      "description": "宁溧城际，连接空港新城江宁站和无想山站"
+    },
+    {
+      "name": "S8号线",
+      "color": "#FF8C00",
+      "opening_date": "2014-08-01",
+      "stations": 17,
+      "description": "宁天城际，连接泰山新村站和金牛湖站"
+    },
+    {
+      "name": "S9号线",
+      "color": "#00BFFF",
+      "opening_date": "2017-12-30",
+      "stations": 6,
+      "description": "宁高城际二期，连接翔宇路南站和高淳站"
+    }
+  ],
+  "data_source": {
+    "weibo_user_id": "2638276292",
+    "search_keyword": "昨日客流",
+    "max_pages": 10
+  },
+  "visualization": {
+    "default_days": 7,
+    "color_scheme": "Set3",
+    "figure_dpi": 100
+  }
+}
