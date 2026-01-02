@@ -26,6 +26,7 @@ def generate_html_report():
             except Exception as e:
                 print(f"读取 {csv_path} 时出错: {e}")
                 continue
+
     if os.path.exists('最近7天客流数据.csv'):
         df = pd.read_csv('最近7天客流数据.csv')
         latest_date = df['date'].iloc[0] if len(df) > 0 else "N/A"
