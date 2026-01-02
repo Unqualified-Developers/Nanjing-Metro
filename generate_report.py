@@ -5,7 +5,6 @@ import os
 import json
 from datetime import datetime, timedelta
 import pandas as pd
-import markdown
 
 def generate_html_report():
     """生成HTML报告"""
