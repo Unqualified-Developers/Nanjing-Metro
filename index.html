@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南京地铁客流分析 - 2026年01月03日</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .update-time {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .image-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            height: 350px;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: contain;
+        }
+        
+        .image-card .caption {
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            height: 320px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .line-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .line-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .line-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 4px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eaeaea;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .images-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚇 南京地铁客流每日分析</h1>
+            <p class="update-time">数据更新于: 2026年01月03日 08:37</p>
+            <p class="update-time">最新数据日期: 01-02</p>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-users"></i> 最新日客流</div>
+                <div class="stat-value">374.4万</div>
+                <div class="stat-label">万人次</div>
+            </div>
+            
+            <div class="stat-card green">
+                <div class="stat-label"><i class="fas fa-chart-line"></i> 7日平均</div>
+                <div class="stat-value">364.9万</div>
+                <div class="stat-label">万人次</div>
+            </div>
+            
+            <div class="stat-card orange">
+                <div class="stat-label"><i class="fas fa-arrow-up"></i> 周变化</div>
+                <div class="stat-value">0.8%</div>
+                <div class="stat-label">与上周相比</div>
+            </div>
+            
+            <div class="stat-card blue">
+                <div class="stat-label"><i class="fas fa-subway"></i> 运营线路</div>
+                <div class="stat-value">13条</div>
+                <div class="stat-label">地铁+S线</div>
+            </div>
+        </div>
+        
+        <h2><i class="fas fa-chart-bar"></i> 可视化图表</h2>
+        <div class="images-grid">
+            <div class="image-card">
+                <img src="images/昨日客流线路占比图.png" alt="昨日客流线路占比">
+                <div class="caption">
+                    <h3>昨日客流线路占比</h3>
+                    <p>各线路在总客流中的比例分布</p>
+                </div>
+            </div>
+            
+            <div class="image-card">
+                <img src="images/最近7天客流强度变化趋势图.png" alt="7天站点客流强度趋势">
+                <div class="caption">
+                    <h3>7天站点客流强度趋势</h3>
+                    <p>各线路站点客流强度变化趋势</p>
+                </div>
+            </div>
+            
+            <div class="image-card">
+                <img src="images/综合分析仪表板.png" alt="综合分析仪表板">
+                <div class="caption">
+                    <h3>综合分析仪表板</h3>
+                    <p>多维度的数据分析视图</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2><i class="fas fa-table"></i> 最近7天数据</h2>
+        <div class="table-container">
+            <table border="1" class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>日期</th>
+      <th>总客流量(万)</th>
+      <th>1号线</th>
+      <th>2号线</th>
+      <th>3号线</th>
+      <th>4号线</th>
+      <th>5号线</th>
+      <th>7号线</th>
+      <th>10号线</th>
+      <th>S1号线</th>
+      <th>S3号线</th>
+      <th>S6号线</th>
+      <th>S7号线</th>
+      <th>S8号线</th>
+      <th>S9号线</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>01-02</td>
+      <td>374.4</td>
+      <td>85.5</td>
+      <td>72.7</td>
+      <td>74.7</td>
+      <td>18.3</td>
+      <td>47.3</td>
+      <td>22.5</td>
+      <td>14.4</td>
+      <td>10.4</td>
+      <td>8.5</td>
+      <td>5.6</td>
+      <td>1.4</td>
+      <td>10.2</td>
+      <td>2.9</td>
+    </tr>
+    <tr>
+      <td>01-01</td>
+      <td>371.5</td>
+      <td>85.0</td>
+      <td>68.7</td>
+      <td>74.2</td>
+      <td>17.3</td>
+      <td>49.0</td>
+      <td>21.8</td>
+      <td>14.3</td>
+      <td>11.6</td>
+      <td>8.7</td>
+      <td>5.5</td>
+      <td>1.5</td>
+      <td>10.4</td>
+      <td>3.5</td>
+    </tr>
+    <tr>
+      <td>12-31</td>
+      <td>533.1</td>
+      <td>129.9</td>
+      <td>93.8</td>
+      <td>96.9</td>
+      <td>27.0</td>
+      <td>58.3</td>
+      <td>37.3</td>
+      <td>26.2</td>
+      <td>17.0</td>
+      <td>14.5</td>
+      <td>7.8</td>
+      <td>2.3</td>
+      <td>16.5</td>
+      <td>5.6</td>
+    </tr>
+    <tr>
+      <td>12-30</td>
+      <td>342.6</td>
+      <td>73.9</td>
+      <td>62.2</td>
+      <td>64.0</td>
+      <td>18.6</td>
+      <td>36.7</td>
+      <td>28.5</td>
+      <td>18.4</td>
+      <td>10.3</td>
+      <td>9.8</td>
+      <td>5.5</td>
+      <td>1.4</td>
+      <td>10.7</td>
+      <td>2.6</td>
+    </tr>
+    <tr>
+      <td>12-29</td>
+      <td>328.8</td>
+      <td>71.5</td>
+      <td>57.5</td>
+      <td>61.0</td>
+      <td>18.1</td>
+      <td>35.1</td>
+      <td>28.3</td>
+      <td>18.4</td>
+      <td>9.8</td>
+      <td>9.6</td>
+      <td>5.4</td>
+      <td>1.4</td>
+      <td>10.5</td>
+      <td>2.2</td>
+    </tr>
+    <tr>
+      <td>12-28</td>
+      <td>280.4</td>
+      <td>61.9</td>
+      <td>51.5</td>
+      <td>52.1</td>
+      <td>14.0</td>
+      <td>31.7</td>
+      <td>19.4</td>
+      <td>15.2</td>
+      <td>9.1</td>
+      <td>7.7</td>
+      <td>4.8</td>
+      <td>1.3</td>
+      <td>9.0</td>
+      <td>2.7</td>
+    </tr>
+    <tr>
+      <td>12-27</td>
+      <td>323.6</td>
+      <td>72.7</td>
+      <td>61.4</td>
+      <td>58.9</td>
+      <td>16.6</td>
+      <td>37.8</td>
+      <td>22.2</td>
+      <td>17.3</td>
+      <td>9.6</td>
+      <td>8.3</td>
+      <td>5.2</td>
+      <td>1.3</td>
+      <td>9.5</td>
+      <td>2.8</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        
+        <h2><i class="fas fa-info-circle"></i> 使用说明</h2>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3>📊 数据来源</h3>
+            <p>数据来源于微博公开数据，每日自动更新。</p>
+            
+            <h3>⏰ 更新频率</h3>
+            <p>每天上午10点(北京时间)自动更新分析报告。</p>
+            
+            <h3>🔧 技术栈</h3>
+            <ul>
+                <li>Python 数据采集与处理</li>
+                <li>Matplotlib 可视化</li>
+                <li>GitHub Actions 自动化</li>
+                <li>GitHub Pages 部署展示</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 南京地铁客流分析系统 | 自动生成 | 更新时间: 2026-01-03 08:37:00</p>
+            <p>数据仅供参考，具体以官方发布为准。</p>
+        </div>
+    </div>
+</body>
+</html>
