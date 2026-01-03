@@ -513,7 +513,7 @@ class NanjingSubwayVisualizer:
                                 ax3.text(j, i, f'{value:.0f}', 
                                         ha='center', va='center', 
                                         color='white' if value > heatmap_data.max()/2 else 'black',
-                                        fontsize=8)
+                                        fontsize=20)
                     
                     ax3.set_title(f'主要线路客流量热力图（最近{n_days}天）', fontsize=14, fontweight='bold')
                 
@@ -528,16 +528,16 @@ class NanjingSubwayVisualizer:
                     min_total = df['total'].min()
                     latest_total = df['total'].iloc[0]
                     
-                    stats_text += f"平均总客流: {avg_total:.1f}万\n"
-                    stats_text += f"最高总客流: {max_total:.1f}万\n"
-                    stats_text += f"最低总客流: {min_total:.1f}万\n"
-                    stats_text += f"最新总客流: {latest_total:.1f}万\n"
+                    stats_text += f"Average: {avg_total:.1f}万\n"
+                    stats_text += f"Max: {max_total:.1f}万\n"
+                    stats_text += f"Min: {min_total:.1f}万\n"
+                    stats_text += f"Latest: {latest_total:.1f}万\n"
                     
                     if len(df) >= 2:
                         change = df['total'].iloc[0] - df['total'].iloc[1]
                         change_pct = (change / df['total'].iloc[1]) * 100 if df['total'].iloc[1] != 0 else 0
-                        trend = "↑增长" if change > 0 else "↓下降"
-                        stats_text += f"日变化: {change:+.1f}万 ({change_pct:+.1f}%) {trend}"
+                        trend = "↑Up" if change > 0 else "↓Down"
+                        stats_text += f"Delta: {change:+.1f}万 ({change_pct:+.1f}%) {trend}"
                 
                 ax4.text(0.1, 0.5, stats_text, fontsize=10, 
                         verticalalignment='center', fontfamily='monospace')
