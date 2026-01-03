@@ -512,7 +512,7 @@ class NanjingSubwayVisualizer:
                             if not np.isnan(value):
                                 ax3.text(j, i, f'{value:.0f}', 
                                         ha='center', va='center', 
-                                        color='black' if value > heatmap_data.max()/2 else 'white',
+                                        color='white' if value > heatmap_data.max()/2 else 'black',
                                         fontsize=8)
                     
                     ax3.set_title(f'主要线路客流量热力图（最近{n_days}天）', fontsize=14, fontweight='bold')
