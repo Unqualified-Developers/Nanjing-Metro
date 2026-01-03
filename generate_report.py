@@ -282,10 +282,10 @@ def generate_html_report():
             </div>
             
             <div class="image-card">
-                <img src="images/最近7天客流强度变化趋势图.png" alt="7天客流趋势">
+                <img src="images/最近7天客流强度变化趋势图.png" alt="7天站点客流强度趋势">
                 <div class="caption">
-                    <h3>7天客流趋势</h3>
-                    <p>各线路客流量变化趋势</p>
+                    <h3>7天站点客流强度趋势</h3>
+                    <p>各线路站点客流强度变化趋势</p>
                 </div>
             </div>
             
