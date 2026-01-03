@@ -8,41 +8,80 @@ import pandas as pd
 
 def generate_html_report():
     """生成HTML报告"""
-
-    # 优先从 docs/data 目录读取
-    data_dirs = [
+    
+    # 初始化变量
+    df = pd.DataFrame()
+    latest_date = "N/A"
+    latest_total = "N/A"
+    avg_total = 0
+    max_total = 0
+    min_total = 0
+    change = 0
+    change_pct = 0
+    
+    # 尝试从多个位置读取数据
+    possible_files = [
         'docs/data/最近7天客流数据.csv',
         '最近7天客流数据.csv',
-        '最近7天客流数据.csv'
+        'docs/data/latest_data.json'
     ]
     
-    df = pd.DataFrame()
-    for csv_path in data_dirs:
-        if os.path.exists(csv_path):
+    # 首先尝试读取CSV数据
+    for file_path in possible_files:
+        if os.path.exists(file_path):
             try:
-                df = pd.read_csv(csv_path, encoding='utf-8')
-                if not df.empty:
+                if file_path.endswith('.csv'):
+                    df = pd.read_csv(file_path, encoding='utf-8')
+                    if not df.empty:
+                        # 提取最新日期和总客流量
+                        if 'date' in df.columns and 'total' in df.columns:
+                            latest_date = df['date'].iloc[0]
+                            latest_total = df['total'].iloc[0]
+                            print(f"✅ 从 {file_path} 读取到数据")
+                            break
+                elif file_path.endswith('.json'):
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        json_data = json.load(f)
+                    latest_date = json_data.get('latest_date', 'N/A')
+                    latest_total = json_data.get('latest_total', 'N/A')
+                    print(f"✅ 从 {file_path} 读取到JSON数据")
                     break
             except Exception as e:
-                print(f"读取 {csv_path} 时出错: {e}")
+                print(f"⚠️ 读取 {file_path} 时出错: {e}")
                 continue
-
-    if os.path.exists('最近7天客流数据.csv'):
-        df = pd.read_csv('最近7天客流数据.csv')
-        latest_date = df['date'].iloc[0] if len(df) > 0 else "N/A"
-        latest_total = df['total'].iloc[0] if len(df) > 0 else "N/A"
-    else:
-        latest_date = "N/A"
-        latest_total = "N/A"
     
-    # 统计信息
-    if len(df) > 0:
+    # 计算统计信息（如果有数据）
+    if not df.empty and 'total' in df.columns:
         avg_total = df['total'].mean()
         max_total = df['total'].max()
         min_total = df['total'].min()
-        change_7d = ((df['total'].iloc[0] - df['total'].iloc[-1]) / df['total'].iloc[-1] * 100) if len(df) > 1 else 0
+        if len(df) > 1:
+            change = df['total'].iloc[0] - df['total'].iloc[1]
+            change_pct = (change / df['total'].iloc[1] * 100) if df['total'].iloc[1] != 0 else 0
     else:
-        avg_total = max_total = min_total = change_7d = "N/A"
+        # 如果没有CSV数据，尝试从日志文件中提取
+        log_file = 'metro_analysis.log'
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    # 查找最新数据
+                    for line in reversed(lines[-20:]):  # 检查最后20行
+                        if '总客流量:' in line:
+                            parts = line.split('总客流量:')
+                            if len(parts) > 1:
+                                total_str = parts[1].strip().split(' ')[0].replace('万', '')
+                                try:
+                                    latest_total = float(total_str)
+                                    print(f"✅ 从日志文件提取到总客流量: {latest_total}")
+                                except:
+                                    pass
+                        if '最新数据日期:' in line:
+                            parts = line.split('最新数据日期:')
+                            if len(parts) > 1:
+                                latest_date = parts[1].strip()
+            except Exception as e:
+                print(f"⚠️ 读取日志文件时出错: {e}")
     
     # HTML模板
     html_template = f"""
