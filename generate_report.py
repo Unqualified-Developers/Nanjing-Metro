@@ -179,7 +179,7 @@ def generate_html_report():
         
         .images-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }}
@@ -189,7 +189,7 @@ def generate_html_report():
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s ease;
-            height: 370px;
+            height: 340px;
         }}
         
         .image-card:hover {{
