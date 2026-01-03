@@ -384,8 +384,8 @@ class NanjingSubwayVisualizer:
                         if stations == 0:
                             stations = 1  # 避免除零错误
                         
-                        # 计算站点客流强度 = 客流量 / 站点数量（取整）
-                        station_intensity = round(df[line] / stations, 4)
+                        # 计算站点客流强度 = 客流量 / 站点数量
+                        station_intensity = df[line] / stations
                         
                         # 在图例中显示线路名称和站点数
                         ax.plot(df['date'], station_intensity, 
@@ -398,7 +398,7 @@ class NanjingSubwayVisualizer:
             # 设置中文标签和标题
             ax.set_xlabel('日期', fontsize=12, fontweight='bold')
             ax.set_ylabel('站点客流强度（万/站）', fontsize=12, fontweight='bold')
-            ax.set_title(f'最近{n_days}天南京地铁各线路站点客流强度变化趋势\n(站点客流强度 = 客流量 ÷ 站点数，四舍五入取整)', 
+            ax.set_title(f'最近{n_days}天南京地铁各线路站点客流强度变化趋势\n(站点客流强度 = 客流量 ÷ 站点数)', 
                         fontsize=14, fontweight='bold', pad=20)
             
             # 添加图例
@@ -412,7 +412,7 @@ class NanjingSubwayVisualizer:
             ax.set_ylim(bottom=0)
             
             # 添加站点客流强度计算公式说明
-            ax.text(0.02, 0.98, '计算公式：站点客流强度 = 客流量 ÷ 站点数量（四舍五入取整）',
+            ax.text(0.02, 0.98, '计算公式：站点客流强度 = 客流量 ÷ 站点数量',
                    transform=ax.transAxes,
                    fontsize=9,
                    verticalalignment='top',
