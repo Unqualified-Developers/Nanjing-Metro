@@ -173,9 +173,9 @@ def generate_html_report():
         
         .images-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
         }}
         
         .image-card {{
@@ -183,6 +183,7 @@ def generate_html_report():
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s ease;
+            height: 420px;
         }}
         
         .image-card:hover {{
@@ -193,7 +194,7 @@ def generate_html_report():
         .image-card img {{
             width: 100%;
             height: 200px;
-            object-fit: cover;
+            object-fit: contain;
         }}
         
         .image-card .caption {{
@@ -205,6 +206,7 @@ def generate_html_report():
         .table-container {{
             overflow-x: auto;
             margin-bottom: 30px;
+            height: 320px;
         }}
         
         table {{
