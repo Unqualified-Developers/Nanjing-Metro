@@ -530,10 +530,7 @@ class NanjingSubwayVisualizer:
                     if len(df) >= 2:
                         change = df['total'].iloc[0] - df['total'].iloc[1]
                         change_pct = (change / df['total'].iloc[1]) * 100 if df['total'].iloc[1] != 0 else 0
-                
-                ax4.text(0.1, 0.5, stats_text, fontsize=10, 
-                        verticalalignment='center', fontfamily='monospace')
-            
+
             fig.suptitle('南京地铁客流综合分析仪表板', fontsize=16, fontweight='bold')
             plt.tight_layout()
             
