@@ -520,24 +520,16 @@ class NanjingSubwayVisualizer:
                 # 统计信息
                 ax4 = fig.add_subplot(gs[2, 0])
                 ax4.axis('off')
-                
-                stats_text = "统计信息:\n"
+
                 if 'total' in df.columns:
                     avg_total = df['total'].mean()
                     max_total = df['total'].max()
                     min_total = df['total'].min()
                     latest_total = df['total'].iloc[0]
                     
-                    stats_text += f"Average: {avg_total:.1f}万\n"
-                    stats_text += f"Max: {max_total:.1f}万\n"
-                    stats_text += f"Min: {min_total:.1f}万\n"
-                    stats_text += f"Latest: {latest_total:.1f}万\n"
-                    
                     if len(df) >= 2:
                         change = df['total'].iloc[0] - df['total'].iloc[1]
                         change_pct = (change / df['total'].iloc[1]) * 100 if df['total'].iloc[1] != 0 else 0
-                        trend = "↑Up" if change > 0 else "↓Down"
-                        stats_text += f"Delta: {change:+.1f}万 ({change_pct:+.1f}%) {trend}"
                 
                 ax4.text(0.1, 0.5, stats_text, fontsize=10, 
                         verticalalignment='center', fontfamily='monospace')
