@@ -37,56 +37,56 @@
     },
     {
       "name": "7号线",
-      "color": "#FF1493",
+      "color": "#006633",
       "opening_date": "2022-12-28",
       "stations": 27,
       "description": "南京地铁第七条开通的线路"
     },
     {
       "name": "10号线",
-      "color": "#00CED1",
+      "color": "#B9975B",
       "opening_date": "2014-07-01",
-      "stations": 14,
+      "stations": 24,
       "description": "连接江北新区和主城区"
     },
     {
       "name": "S1号线",
-      "color": "#32CD32",
+      "color": "#00B2A9",
       "opening_date": "2014-07-01",
       "stations": 9,
       "description": "机场线，连接南京南站和禄口机场"
     },
     {
       "name": "S3号线",
-      "color": "#FF4500",
+      "color": "#B06C96",
       "opening_date": "2017-12-06",
       "stations": 19,
       "description": "宁和城际，连接南京南站和高家冲"
     },
     {
       "name": "S6号线",
-      "color": "#DC143C",
+      "color": "#D593C4",
       "opening_date": "2021-12-28",
       "stations": 13,
       "description": "宁句城际，连接马群站和句容站"
     },
     {
       "name": "S7号线",
-      "color": "#8A2BE2",
+      "color": "#D42941",
       "opening_date": "2018-05-26",
       "stations": 9,
       "description": "宁溧城际，连接空港新城江宁站和无想山站"
     },
     {
       "name": "S8号线",
-      "color": "#FF8C00",
+      "color": "#EA7600",
       "opening_date": "2014-08-01",
-      "stations": 17,
+      "stations": 19,
       "description": "宁天城际，连接泰山新村站和金牛湖站"
     },
     {
       "name": "S9号线",
-      "color": "#00BFFF",
+      "color": "#F1B434",
       "opening_date": "2017-12-30",
       "stations": 6,
       "description": "宁高城际二期，连接翔宇路南站和高淳站"
