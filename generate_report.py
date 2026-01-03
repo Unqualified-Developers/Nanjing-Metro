@@ -51,13 +51,19 @@ def generate_html_report():
                 continue
     
     # 计算统计信息（如果有数据）
-    if not df.empty and 'total' in df.columns:
+   if not df.empty and 'total' in df.columns:
         avg_total = df['total'].mean()
         max_total = df['total'].max()
         min_total = df['total'].min()
         if len(df) > 1:
             change = df['total'].iloc[0] - df['total'].iloc[1]
             change_pct = (change / df['total'].iloc[1] * 100) if df['total'].iloc[1] != 0 else 0
+        
+        # 重命名列名为中文
+        df = df.rename(columns={
+            'date': '日期',
+            'total': '总客流量(万)'
+        })
     else:
         # 如果没有CSV数据，尝试从日志文件中提取
         log_file = 'metro_analysis.log'
@@ -173,7 +179,7 @@ def generate_html_report():
         
         .images-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }}
@@ -183,7 +189,7 @@ def generate_html_report():
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s ease;
-            height: 420px;
+            height: 370px;
         }}
         
         .image-card:hover {{
