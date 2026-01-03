@@ -51,7 +51,7 @@ def generate_html_report():
                 continue
     
     # 计算统计信息（如果有数据）
-   if not df.empty and 'total' in df.columns:
+    if not df.empty and 'total' in df.columns:
         avg_total = df['total'].mean()
         max_total = df['total'].max()
         min_total = df['total'].min()
