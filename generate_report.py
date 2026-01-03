@@ -301,7 +301,7 @@ def generate_html_report():
             
             <div class="stat-card orange">
                 <div class="stat-label"><i class="fas fa-arrow-up"></i> 周变化</div>
-                <div class="stat-value">{change_7d if change_7d != 'N/A' else 'N/A':.1f}%</div>
+                <div class="stat-value">{change_pct if change_pct != 'N/A' else 'N/A':.1f}%</div>
                 <div class="stat-label">与上周相比</div>
             </div>
             
