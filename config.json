@@ -2,37 +2,37 @@
   "lines": [
     {
       "name": "1号线",
-      "color": "#FF0000",
+      "color": "#009ACE",
       "opening_date": "2005-09-03",
-      "stations": 27,
+      "stations": 32,
       "description": "南京地铁最早开通的线路，连接迈皋桥和河定桥"
     },
     {
       "name": "2号线",
-      "color": "#FFA500",
+      "color": "#A6093D",
       "opening_date": "2010-05-28",
-      "stations": 26,
+      "stations": 30,
       "description": "东西走向的主要线路"
     },
     {
       "name": "3号线",
-      "color": "#9ACD32",
+      "color": "#0094AA",
       "opening_date": "2015-04-01",
-      "stations": 29,
+      "stations": 30,
       "description": "南北走向的骨干线路"
     },
     {
       "name": "4号线",
-      "color": "#1E90FF",
+      "color": "#7D55C7",
       "opening_date": "2017-01-18",
       "stations": 18,
       "description": "东西走向，连接龙江站和仙林湖站"
     },
     {
       "name": "5号线",
-      "color": "#800080",
+      "color": "#FFDA24",
       "opening_date": "2023-12-28",
-      "stations": 15,
+      "stations": 30,
       "description": "南京地铁第五条建成运营的线路"
     },
     {
