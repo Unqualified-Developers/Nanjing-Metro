@@ -385,7 +385,7 @@ class NanjingSubwayVisualizer:
                             stations = 1  # 避免除零错误
                         
                         # 计算站点客流强度 = 客流量 / 站点数量（取整）
-                        station_intensity = round(df[line] / stations)
+                        station_intensity = round(df[line] / stations, 4)
                         
                         # 在图例中显示线路名称和站点数
                         ax.plot(df['date'], station_intensity, 
