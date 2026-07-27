@@ -15,7 +15,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# ========== 设置中文字体（避免图表中文显示方框）==========
+# ========= 设置中文字体（避免图表中文显示方框）=========
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'WenQuanYi Zen Hei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示为方块的问题
 # =====================================================
