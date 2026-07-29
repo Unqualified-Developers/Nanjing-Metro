@@ -441,7 +441,7 @@ def generate_html_report():
                 <div class="caption"><h3>昨日各线路客流占比</h3></div>
             </div>
             <div class="image-card">
-                <img src="images/last_60_days_total_passenger_trend.png" alt="总客流量趋势图">
+                <img src="images/last_30_days_total_passenger_trend.png" alt="总客流量趋势图">
                 <div class="caption"><h3>总客流量趋势</h3></div>
             </div>
             <div class="image-card">
