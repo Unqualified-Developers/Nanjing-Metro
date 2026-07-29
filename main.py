@@ -158,7 +158,7 @@ class NanjingSubwayVisualizer:
             logger.error(f"生成占比饼图时出错: {e}", exc_info=True)
             return None
 
-    def plot_total_passenger_trend(self, n_days=60):
+    def plot_total_passenger_trend(self, n_days=30):
         """总客流量趋势图"""
         try:
             df = self.data_collector.get_last_n_days_line_data(n_days)
