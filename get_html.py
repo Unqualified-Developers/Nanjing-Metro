@@ -7,7 +7,8 @@ from selenium.webdriver.edge.options import Options
 edge_options = Options()
 
 driver = webdriver.Edge(options=edge_options)
-driver.get("https://m.weibo.cn/u/2638276292")
+# driver.get("https://m.weibo.cn/u/2638276292")
+driver.get("https://m.weibo.cn/search?containerid=231522type%3D1%26t%3D10%26q%3D%23%E6%98%A8%E6%97%A5%E5%AE%A2%E6%B5%81%23&isnewpage=1&luicode=10000011&lfid=100103type%3D1%26q%3D%E6%98%A8%E6%97%A5%E5%AE%A2%E6%B5%81&launchid=10000360-page_H5")
 time.sleep(10)
 
 
