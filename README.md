@@ -2,13 +2,10 @@
 # 🚇 Nanjing Metro Data Collection Project
 
 <p align="center">
-
-<a href="README_CN.md">中文版本</a>
-
-<a href="https://unqualified-developers.github.io/Nanjing-Metro/">在线网站</a>
-
+  <a href="README_CN.md">中文版本</a>
+  <br>
+  <a href="https://unqualified-developers.github.io/Nanjing-Metro/">在线网站</a>
 </p>
-
 <p align="center">
 
 <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python">
