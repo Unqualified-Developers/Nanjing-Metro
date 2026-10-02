@@ -29,10 +29,10 @@ try:
     )
 
     realtime_button.click()
-    print("点击实时成功")
+    print("Click Real-time Success")
 
 except Exception as e:
-    print("没有找到实时按钮:", e)
+    print("The real-time button was not found", e)
 
 
 # 等待实时内容加载
