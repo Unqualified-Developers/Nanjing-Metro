@@ -421,12 +421,6 @@ def generate_html_report():
                 <div class="stat-label">与昨日相比</div>
             </div>
 
-            <div class="stat-card {week_color} change-card">
-                <div class="stat-label">周同比</div>
-                <div class="stat-value">{format_change_with_amount(week_change_pct, week_change_amount)}</div>
-                <div class="stat-label">与上周同日相比</div>
-            </div>
-
             <div class="stat-card dark-blue line-card">
                 <div class="stat-label">运营线路</div>
                 <div class="stat-value">{format_line_info(quantity, total_stations)}</div>
@@ -454,7 +448,7 @@ def generate_html_report():
             </div>
         </div>
 
-        <h2>最近30天数据明细</h2>
+        <h2>最近7天数据明细</h2>
         <div class="table-container">
             {df.to_html(index=False, classes='data-table') if len(df) > 0 else '<p>暂无数据</p>'}
         </div>
