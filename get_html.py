@@ -1,3 +1,6 @@
+import sys
+
+sys.stdout.reconfigure(encoding='utf-8')
 import random
 import time
 import os
@@ -54,8 +57,17 @@ def smooth_scroll_to_bottom():
 
 smooth_scroll_to_bottom()
 
-
 time.sleep(random.uniform(1, 2))
+
+
+# 获取页面文字结果
+page_text = driver.find_element(By.TAG_NAME, "body").text
+
+print("====================")
+print("Get Weibo Data:")
+print("====================")
+
+print(page_text[:3000])   # 打印前3000个字符
 
 
 # 自动创建目录
@@ -70,4 +82,5 @@ with open("docs/data/page.html", "w", encoding="utf-8") as f:
 
 
 driver.quit()
-print('get data success')
+
+print("get data success")
