@@ -44,7 +44,7 @@ time.sleep(3)
 def smooth_scroll_to_bottom():
     current_position = 0
 
-    while current_position < 2500:
+    while current_position < 1500:
         step = random.randint(300, 700)
         current_position += step
 
