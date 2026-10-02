@@ -1,56 +1,145 @@
-# Nanjing-Metro
 
-## 项目简介
+# 🚇 Nanjing Metro Data Collection Project
 
-自动获取南京地铁官方微博的每日客流数据，并进行可视化分析的Python项目。
+<p align="center">
 
-## 文件结构
+<a href="README_CN.md">中文版本</a>
+
+</p>
+
+<p align="center">
+
+<img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python">
+<img src="https://img.shields.io/badge/Selenium-Web_Automation-green?logo=selenium">
+<img src="https://img.shields.io/badge/Microsoft%20Edge-WebDriver-0078d7?logo=microsoftedge">
+<img src="https://img.shields.io/badge/HTML5-Data_Collection-orange?logo=html5">
+<img src="https://img.shields.io/badge/Web%20Scraping-Dynamic_Page-purple">
+<img src="https://img.shields.io/badge/GitHub-Open_Source-black?logo=github">
+
+</p>
+
+<p align="center">
+A Python-based web data collection project for Nanjing Metro information.
+</p>
+
+
+## 📌 Overview
+
+Nanjing Metro Data Collection Project is a Python-based web data collection project.
+
+This project uses Selenium browser automation technology to collect dynamic web page information related to Nanjing Metro, simulate user operations, and save collected HTML data for further analysis.
+
+## ✨ Features
+
+### Web Data Collection
+
+- Automatically open target webpages
+- Support dynamic webpage loading
+- Simulate scrolling behavior
+- Capture webpage HTML source code
+- Save collected data locally
+
+## 🛠 Technology Stack
+
+| Technology | Description |
+|---|---|
+| Python | Main programming language |
+| Selenium | Browser automation |
+| Edge WebDriver | Browser control |
+| HTML | Data storage format |
+| Git | Version control |
+
+## 📂 Project Structure
 
 ```
-
-├──config.json           # 线路配置数据
-├──metro_data.py         # 数据处理模块
-├──main.py               # 主程序可视化模块
-├──generate_report.py    # 生成报告模块
-├──get_cookie.py         # 手动更新微博cookie
-├──send_email.py         # QQ邮箱发送Cookie过期提示
-├──setup_fonts.py        # 设置中文字体
-├──.gitignore            # 忽略文件
-└──requirements.txt      # 依赖包列表
-
+Nanjing-Metro
+│
+├── get_html.py
+│
+├── docs
+│   └── data
+│       └── page.html
+│
+├── requirements.txt
+│
+├── README.md
+└── README_CN.md
 ```
 
-## 功能特点
+## 🚀 Installation
 
-- 自动爬取微博客流数据
-- 支持13条地铁线路分析
-- 生成多种可视化图表
-- 导出CSV数据文件
-
-## 安装运行
+Clone repository:
 
 ```bash
-# 安装依赖
-pip install -r requirements.txt
-
-# 运行程序
-python main.py
+git clone https://github.com/Unqualified-Developers/Nanjing-Metro.git
 ```
 
-输出图表
+Install dependencies:
 
-1. 昨日客流线路占比图（饼图+条形图）
-2. 最近7天客流强度变化趋势图
-3. 最近7天客流占比变化趋势图
-4. 综合分析仪表板
-5. 最近7天客流数据.csv
+```bash
+pip install -r requirements.txt
+```
 
-支持的线路
+Run:
 
-1号线、2号线、3号线、4号线、5号线、7号线、10号线、S1号线、S3号线、S6号线、S7号线、S8号线、S9号线
+```bash
+python get_html.py
+```
 
-注意事项
+## ⚙️ Workflow
 
-· 数据来自微博，仅供参考
-· 需保持网络连接
-· 可能需要更新微博Cookie
+```
+Start Program
+      |
+      ↓
+Open Browser
+      |
+      ↓
+Load Website
+      |
+      ↓
+Dynamic Content Loading
+      |
+      ↓
+Automatic Scrolling
+      |
+      ↓
+Collect HTML
+      |
+      ↓
+Save Data
+```
+
+## 📄 Output
+
+Collected webpage data will be saved:
+
+```
+docs/data/page.html
+```
+
+## 🔮 Future Plans
+
+- [ ] Automatically extract metro passenger flow data
+- [ ] Add HTML parser
+- [ ] Store data in database
+- [ ] Build visualization dashboard
+- [ ] Add scheduled data collection
+
+## ⚠️ Disclaimer
+
+This project is for learning and research purposes only.
+
+Please follow website terms of service and related regulations when collecting data.
+
+## 👨‍💻 Author
+
+Unqualified Developers
+
+GitHub:
+https://github.com/Unqualified-Developers
+
+## 🤝 Contribution
+
+Issues and Pull Requests are welcome.
+```
