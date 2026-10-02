@@ -29,7 +29,6 @@ try:
     )
 
     realtime_button.click()
-    print("Click Real-time Success")
 
 except Exception as e:
     print("The real-time button was not found", e)
@@ -71,3 +70,4 @@ with open("docs/data/page.html", "w", encoding="utf-8") as f:
 
 
 driver.quit()
+print('get data success')
